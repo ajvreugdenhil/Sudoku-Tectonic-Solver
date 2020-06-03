@@ -1,8 +1,11 @@
 #include <iostream>
 #include "sudokutectonic.hpp"
 
-// TODO: pretty up maxvalue
+// TODO: clean up these variables
+//#define MAXVALUE 5
+//static int shapeAmount = 10;
 #define MAXVALUE 6
+static int shapeAmount = 24;
 
 bool fieldIsValid(struct square** field, int sizeX, int sizeY)
 {
@@ -85,22 +88,6 @@ bool fieldIsValid(struct square** field, int sizeX, int sizeY)
     }
 
     // Check shapes
-
-    // get highest shape id
-    // performance upgrade if this is saved somewhere
-    int shapeAmount = 0;
-    for (int row = 0; row < sizeY; row++)
-    {
-        for (int column = 0; column < sizeX; column++)
-        {
-            if (field[column][row].shapeID > shapeAmount)
-            {
-                shapeAmount = field[column][row].shapeID;
-            }
-        }
-    }
-    shapeAmount++;
-
     for (int shape = 0; shape < shapeAmount; shape++)
     {
         for (int n = 1; n <= MAXVALUE; n++)
@@ -126,7 +113,6 @@ bool fieldIsValid(struct square** field, int sizeX, int sizeY)
             }
         }
     }
-
     return true;
 }
 

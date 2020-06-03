@@ -1,30 +1,30 @@
 /* 
  * Sudoku tectonic solver
- * MIVD, here I come
+ * Written by Arjan Vreugdenhil
  */
+
 #include <iostream>
 #include <fstream>
 #include <string>
-
 #include <signal.h>
-
 #include "sudokutectonic.hpp"
 
-#define INPUTFILE "puzzle4.csv"
 /*
+Structure of the internal field is as follows:
 0,0,0,0,x=5 ->  array with vertical arrays
-0,0,0,0,0       [x][y]
-0,0,0,0,0
-0,0,0,0,0
-y=5,0,0,0
+0,0,0,0         [x][y]
+0,0,0,0
+0,0,0,0
+y=5
 */
 
 square** globalField;
+std::string inputFile = "puzzle4.csv";
+
 void sighandler(int s){
-           printf("Caught signal %d\n",s);
+           printf("\nCaught signal %d\n\n",s);
            printField(globalField, 12, 12);
            exit(1); 
-
 }
 
 int main(int argc, const char *argv[])
@@ -32,6 +32,11 @@ int main(int argc, const char *argv[])
     signal(SIGABRT, &sighandler);
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT, &sighandler);
+
+    if (argc == 2)
+    {
+        inputFile = argv[1];
+    }
 
     int maximumFieldX = 200;
     int maximumFieldY = 200;
@@ -44,10 +49,10 @@ int main(int argc, const char *argv[])
     int rows;
     int columns;
     std::string line;
-    std::ifstream myfile(INPUTFILE);
+    std::ifstream myfile(inputFile);
     if (myfile.is_open())
     {
-        // We start with the shape id grid
+        // We start with the shape ID grid
         int rowNr = 0;
         while ( std::getline(myfile, line) && (line != ""))
         {
@@ -59,7 +64,6 @@ int main(int argc, const char *argv[])
                 {
                     field[columnNr][rowNr].shapeID = stoi(currentNumber);
                     currentNumber = "";
-                    // Save the very last column number. that's the amount of columns
                     columnNr++;
                     columns = columnNr;
                 }
@@ -68,7 +72,6 @@ int main(int argc, const char *argv[])
                     currentNumber += line[i];
                 }
             }
-            // Save the last row number. same as columns
             rowNr++;
             rows = rowNr;
         }
@@ -96,19 +99,26 @@ int main(int argc, const char *argv[])
 
         myfile.close();
     }
+
     globalField = field;
     std::cout << "Imported puzzle:\n";
     printField(field, columns, rows);
-    //std::cout << "\n" << fieldIsValid(field, columns, rows) << "\n";
-    
     if(solve(field, columns, rows))
     {
-        std::cout << "solution was found!!!!1!\n";
+        std::cout << "Solution found:\n";
     }
     else
     {
-        std::cout << "solution not found\n";
+        std::cout << "Solution not found.\n";
     }
     printField(field, columns, rows);
+
+    // Clean up
     
+    for (int i = 0; i < 200; i++)
+    {
+        delete[] field[i];
+    }
+    
+    delete[] field;
 }
